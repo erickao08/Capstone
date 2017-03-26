@@ -1,0 +1,44 @@
+---
+title: "Capstone Project"
+author: "Eric Kao"
+date: "March 26, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+#preload all the dataframe
+df1 <-read.csv('student-mat.csv')
+df2 <-read.csv('student-por.csv')
+
+d3=merge(df1,df2,by=c("school","sex","age","address","famsize","Pstatus","Medu","Fedu","Mjob","Fjob","reason","nursery","internet"))
+
+```
+
+## Student Alcohol Consumption
+
+**Student Alcohol Consumption** dataset is what I decided for my springboard capstone project. You can find the original dataset at [here](https://www.kaggle.com/uciml/student-alcohol-consumption)
+
+Let's take a first look of the dataset.
+
+```{r cars}
+d1=read.table("student-mat.csv",sep=";",header=TRUE)
+summary(d1)
+str(d1)
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+library(ggplot2)
+base1<-ggplot(df1,aes(x=Dalc,y=G1,col=sex))
+base1+geom_point()
+base1+geom_jitter()
+base1+geom_boxplot()+facet_grid(.~Dalc)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
