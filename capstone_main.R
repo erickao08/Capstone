@@ -15,3 +15,5 @@ base1<-ggplot(df1,aes(x=Dalc,y=G1,col=sex))
 base1+geom_point()
 base1+geom_jitter()
 base1+geom_boxplot()+facet_grid(.~Dalc)
+
+
