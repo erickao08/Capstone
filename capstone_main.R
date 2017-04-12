@@ -1,5 +1,6 @@
 library(dplyr)
 library(ggplot2)
+library(plyr)
 
 #read csv files and merge them together
 df1 <-read.csv('student-mat.csv')
@@ -14,16 +15,19 @@ d3_clean<-d3%>% mutate(grade_mean_Math=(G1.x+G3.x+G2.x)/3)%>%mutate(grade_mean_P
 df1<-df1%>%mutate(grade_mean=(G1+G2+G3)/3)
 df2<-df2%>%mutate(grade_mean=(G1+G2+G3)/3)
 df1$Dalc<-as.factor(df1$Dalc)
+df1$Dalc <- mapvalues(df1$Dalc, 
+                              from = 1:5, 
+                              to = c("Very Low", "Low", "Medium", "High", "Very High"))
 #plots for x= daily consumption y=G1, seperated by gender
 
-<<<<<<< HEAD
+#<<<<<<< HEAD
 base1<-ggplot(df1,aes(x=Dalc,y=G1,col=sex))
 base1+geom_point()
 base1+geom_jitter()
 base1+geom_boxplot()+facet_grid(.~Dalc)
 
 
-=======
+#=======
 #get the distribution of each gender in each group
 base1<-ggplot(df1,aes(x=Dalc,y=grade_mean,col=sex))
 
@@ -38,4 +42,4 @@ base2+geom_boxplot()+facet_grid(.~Dalc)
 
 #get the proportion of each group in each gender
 ggplot(df1, aes(x=sex ,fill= Dalc ))+geom_bar(position="fill")
->>>>>>> feb9a37e58669fe05fe42618a6f74e87f876b926
+

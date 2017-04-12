@@ -8,6 +8,8 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
+library(dplyr)
+library(plyr)
 #preload all the dataframe
 df1 <-read.csv('student-mat.csv')
 df2 <-read.csv('student-por.csv')
@@ -23,9 +25,9 @@ d3=merge(df1,df2,by=c("school","sex","age","address","famsize","Pstatus","Medu",
 Let's take a first look of the dataset.
 
 ```{r cars}
-d1=read.table("student-mat.csv",sep=";",header=TRUE)
-summary(d1)
-str(d1)
+summarise(df1)
+summarise(df2)
+
 
 ```
 
