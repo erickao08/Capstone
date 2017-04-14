@@ -43,3 +43,7 @@ base2+geom_boxplot()+facet_grid(.~Dalc)
 #get the proportion of each group in each gender
 ggplot(df1, aes(x=sex ,fill= Dalc ))+geom_bar(position="fill")
 
+
+ggplot(df1, aes(x=Dalc, y=school, color=sex))+
+  geom_jitter(alpha=0.7)
+

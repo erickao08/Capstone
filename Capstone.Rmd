@@ -24,9 +24,9 @@ d3=merge(df1,df2,by=c("school","sex","age","address","famsize","Pstatus","Medu",
 
 Let's take a first look of the dataset.
 
-```{r cars}
-summarise(df1)
-summarise(df2)
+```{}
+View(df1)
+View(df2)
 
 
 ```
