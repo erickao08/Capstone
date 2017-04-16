@@ -21,11 +21,14 @@ df1$Dalc <- mapvalues(df1$Dalc,
 #plots for x= daily consumption y=G1, seperated by gender
 
 #<<<<<<< HEAD
-base1<-ggplot(df1,aes(x=Dalc,y=G1,col=sex))
+base1_G1<-ggplot(df1,aes(x=Dalc,y=G1,col=sex))
+base1_G2<-ggplot(df1,aes(x=Dalc,y=G2,col=sex))
+base1_G3<-ggplot(df1,aes(x=Dalc,y=G3,col=sex))
 base1+geom_point()
 base1+geom_jitter()
 base1+geom_boxplot()+facet_grid(.~Dalc)
 
+#save the jpg 
 
 #=======
 #get the distribution of each gender in each group
