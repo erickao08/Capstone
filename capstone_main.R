@@ -24,7 +24,11 @@ df1$Dalc <- mapvalues(df1$Dalc,
 base1_G1<-ggplot(df1,aes(x=Dalc,y=G1,col=sex))
 base1_G2<-ggplot(df1,aes(x=Dalc,y=G2,col=sex))
 base1_G3<-ggplot(df1,aes(x=Dalc,y=G3,col=sex))
-base1+geom_point()
+base1_class_sex<-ggplot(df1,aes(x=school, col=sex))
+base1_class_sex+geom_bar(stat="count",colours=sex,position = fill)
+
+
+base1+geom_point()+facet_grid(.~school)
 base1+geom_jitter()
 base1+geom_boxplot()+facet_grid(.~Dalc)
 
