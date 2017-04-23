@@ -24,7 +24,7 @@ d3=merge(df1,df2,by=c("school","sex","age","address","famsize","Pstatus","Medu",
 
 Let's take a first look of the dataset.
 
-```{}
+```{r}
 df1
 View(df2)
 
@@ -35,12 +35,47 @@ View(df2)
 
 You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
+```{r}
 library(ggplot2)
 base1<-ggplot(df1,aes(x=Dalc,y=G1,col=sex))
-base1+geom_point()
-base1+geom_jitter()
-base1+geom_boxplot()+facet_grid(.~Dalc)
+
 ```
 
+
+```{r}
+base1+geom_point()
+```
+
+```{r}
+base1+geom_jitter()
+```
+
+```{r}
+base1+geom_boxplot()+facet_grid(.~Dalc)
+
+```
+
+
+check grade by sex and Dalc
+```{r}
+base1_G1<-ggplot(df1,aes(x=Dalc,y=G1,col=sex))
+base1_G2<-ggplot(df1,aes(x=Dalc,y=G2,col=sex))
+base1_G3<-ggplot(df1,aes(x=Dalc,y=G3,col=sex))
+base1_class_sex<-ggplot(df1,aes(x=school, col=sex))
+```
+
+```{r}
+base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = 'fill')
+
+```
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+```{r}
+df1$Dalc <- mapvalues(df1$Dalc, 
+                              from = 1:5, 
+                              to = c("Very Low", "Low", "Medium", "High", "Very High"))
+base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = "fill")+facet_grid(.~Dalc)
+
+```
