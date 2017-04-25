@@ -41,8 +41,18 @@ cleaning data
 library(ggplot2)
 df2<-df2%>%mutate(grade_mean=(G1+G2+G3)/3)
 df1<-df1%>%mutate(grade_mean=(G1+G2+G3)/3)
-base1<-ggplot(df1,aes(x=Dalc,y=grade_mean,col=sex))
 
+
+```
+
+```{r}
+df1$Dalc <- mapvalues(df1$Dalc, 
+                              from = 1:5, 
+                              to = c("Very Low", "Low", "Medium", "High", "Very High"))
+df2$Dalc <- mapvalues(df2$Dalc, 
+                              from = 1:5, 
+                              to = c("Very Low", "Low", "Medium", "High", "Very High"))
+base1<-ggplot(df1,aes(x=Dalc,y=grade_mean,col=sex))
 ```
 
 
@@ -51,11 +61,11 @@ base1+geom_point()
 ```
 
 ```{r}
-base1+geom_jitter()
+base1+geom_jitter()+ggtitle("Student distribution dotplot based on Workday alcohol consumption")+labs(x="Workday Alcohol Consumption")
 ```
 
 ```{r}
-base1+geom_boxplot()+facet_grid(.~Dalc)
+base1+geom_boxplot()+facet_grid(.~Dalc)+ggtitle("Student boxplot based on Workday alcohol consumption")
 
 ```
 
@@ -65,11 +75,12 @@ check grade by sex and Dalc
 base1_G1<-ggplot(df1,aes(x=Dalc,y=G1,col=sex))
 base1_G2<-ggplot(df1,aes(x=Dalc,y=G2,col=sex))
 base1_G3<-ggplot(df1,aes(x=Dalc,y=G3,col=sex))
+base1_class_sex<-ggplot(df1,aes(x=school, col=sex))
 
 ```
 
 ```{r}
-base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = 'fill')
+base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = 'fill')+ggtitle("Gender Proportion of each group")
 
 ```
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
@@ -77,14 +88,9 @@ Note that the `echo = FALSE` parameter was added to the code chunk to prevent pr
 
 
 ```{r}
-df1$Dalc <- mapvalues(df1$Dalc, 
-                              from = 1:5, 
-                              to = c("Very Low", "Low", "Medium", "High", "Very High"))
-df2$Dalc <- mapvalues(df2$Dalc, 
-                              from = 1:5, 
-                              to = c("Very Low", "Low", "Medium", "High", "Very High"))
+
 #why this is not woring in here
 base1_class_sex<-ggplot(df1,aes(x=school, col=sex))
-base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = "fill")+facet_grid(.~Dalc)
+base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = "fill")+facet_grid(.~Dalc)+ggtitle("Gender Proportion of each group")
 
 ```
