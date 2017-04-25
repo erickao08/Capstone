@@ -16,6 +16,8 @@ df2 <-read.csv('student-por.csv')
 
 d3=merge(df1,df2,by=c("school","sex","age","address","famsize","Pstatus","Medu","Fedu","Mjob","Fjob","reason","nursery","internet"))
 
+
+
 ```
 
 ## Student Alcohol Consumption
@@ -26,18 +28,20 @@ Let's take a first look of the dataset.
 
 ```{r}
 df1
-View(df2)
+str(df2)
 
 
 ```
 
 ## Including Plots
 
-You can also embed plots, for example:
+cleaning data
 
 ```{r}
 library(ggplot2)
-base1<-ggplot(df1,aes(x=Dalc,y=G1,col=sex))
+df2<-df2%>%mutate(grade_mean=(G1+G2+G3)/3)
+df1<-df1%>%mutate(grade_mean=(G1+G2+G3)/3)
+base1<-ggplot(df1,aes(x=Dalc,y=grade_mean,col=sex))
 
 ```
 
@@ -61,7 +65,7 @@ check grade by sex and Dalc
 base1_G1<-ggplot(df1,aes(x=Dalc,y=G1,col=sex))
 base1_G2<-ggplot(df1,aes(x=Dalc,y=G2,col=sex))
 base1_G3<-ggplot(df1,aes(x=Dalc,y=G3,col=sex))
-base1_class_sex<-ggplot(df1,aes(x=school, col=sex))
+
 ```
 
 ```{r}
@@ -76,6 +80,11 @@ Note that the `echo = FALSE` parameter was added to the code chunk to prevent pr
 df1$Dalc <- mapvalues(df1$Dalc, 
                               from = 1:5, 
                               to = c("Very Low", "Low", "Medium", "High", "Very High"))
+df2$Dalc <- mapvalues(df2$Dalc, 
+                              from = 1:5, 
+                              to = c("Very Low", "Low", "Medium", "High", "Very High"))
+#why this is not woring in here
+base1_class_sex<-ggplot(df1,aes(x=school, col=sex))
 base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = "fill")+facet_grid(.~Dalc)
 
 ```
