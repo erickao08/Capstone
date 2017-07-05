@@ -1,0 +1,52 @@
+---
+title: "Proposal"
+author: "Eric"
+date: "July 5, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### What is the problem you want to solve?
+
+
+I want to see if the grade of the student is related to the consumption of alcohol and create a model to identify the student who is a potential drinker based on the family background.
+
+
+
+
+#### Who is your client and why do they care about this problem? In other words, what will your client DO or DECIDE based on your analysis that they wouldn’t have otherwise?
+
+My client will be UCIML. 
+
+Nowadays, the problem of teenagers alcohol consumption is becoming serious in the US. I want to know if the alcohol consumption really has a negative impact on the teenager. If it does, I want to use the data to build a model to identify the potential young drinker based on the family background. 
+
+The school needs to help the student with limited budget and without any indicators, the decision maker cannot put the right resource into the right place. 
+
+
+
+####What data are you going to use for this? How will you acquire this data?
+
+
+https://www.kaggle.com/uciml/student-alcohol-consumption
+
+The data were obtained in a survey of students math and portuguese language courses in secondary school. In brief, outline your approach to solving this problem (knowing that this might change later).
+
+
+####In brief, outline your approach to solving this problem (knowing that this might change later).
+
+
+Data wrangling: The first step is that I will do the data wrangling to clean up all the missing data. Second, I will set  a alcohol consumption flag for both school to see if the student has the tendency to use alcohol(weekdays consumption ratio is higher than 3). Later, I will create some plots to get a better idea of the dataset. For example, the distribution of alcohol consumption in different gender or different school. From there we can see if the alcohol consumption is related with the grade. 
+
+
+Building the model: I will separate the data into 2 sets: train and test, randomly picked 2 classes since in our case I want to get a more general approach about the data. I will build the model by using logistic regression because I want to classify the students into 2 groups. Later I will use the model to predict the test model and then check if the model is good model or not. 
+
+
+####What are your deliverables? Typically, this would include code, along with a paper and/or a slide deck.
+
+
+
+The best scenario is I deliver the evidence that shows the relationship of alcohol consumption and a good model that can predict the outcome. The code will be included. 
+
