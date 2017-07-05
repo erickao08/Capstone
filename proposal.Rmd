@@ -45,8 +45,9 @@ Building the model: I will separate the data into 2 sets: train and test, random
 
 
 ####What are your deliverables? Typically, this would include code, along with a paper and/or a slide deck.
-
-
+```{css}
+margin-bottom:100px;
+```
 
 The best scenario is I deliver the evidence that shows the relationship of alcohol consumption and a good model that can predict the outcome. The code will be included. 
 
