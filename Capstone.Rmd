@@ -27,23 +27,38 @@ d3=merge(df1,df2,by=c("school","sex","age","address","famsize","Pstatus","Medu",
 Let's take a first look of the dataset.
 
 ```{r}
-df1
-str(df2)
-
-
+str(df1)
 ```
+There are 395 observation in the math class data set with 33 varibles.
+```{r}
+str(df2)
+```
+There are 395 observation in the math class data set with 33 varibles.
+
 
 ## Including Plots
 
-cleaning data
+###Data wrangling
+
+Since my first goal is to identify the realtionship between alcohol consumption and the grade. I need to create a column to record if the student fails the test or not.
 
 ```{r}
 library(ggplot2)
 df2<-df2%>%mutate(grade_mean=(G1+G2+G3)/3)
 df1<-df1%>%mutate(grade_mean=(G1+G2+G3)/3)
-
-
+df1$grade_mean
+df2$grade_mean
 ```
+I calculated the mean to represent how well the students performance in the class.I also use it as a classifier to see if the student does better than the average of the class.
+
+```{r}
+meandf1 = mean(df1$grade_mean)
+meandf2 = mean(df2$grade_mean)
+df1<-df1%>%mutate(pass_fail=ifelse(grade_mean>meandf1,TRUE,FALSE))
+df2<-df2%>%mutate(pass_fail=ifelse(grade_mean>meandf2,TRUE,FALSE))
+```
+
+
 
 ```{r}
 df1$Dalc <- mapvalues(df1$Dalc, 
