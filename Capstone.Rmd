@@ -46,6 +46,7 @@ Since my first goal is to identify the realtionship between alcohol consumption 
 library(ggplot2)
 df2<-df2%>%mutate(grade_mean=(G1+G2+G3)/3)
 df1<-df1%>%mutate(grade_mean=(G1+G2+G3)/3)
+quantile(df1$grade_mean)
 df1$grade_mean
 df2$grade_mean
 ```
@@ -54,8 +55,13 @@ I calculated the mean to represent how well the students performance in the clas
 ```{r}
 meandf1 = mean(df1$grade_mean)
 meandf2 = mean(df2$grade_mean)
-df1<-df1%>%mutate(pass_fail=ifelse(grade_mean>meandf1,TRUE,FALSE))
+
+q1df1 = 8.33
+
+df1<-df1%>%mutate(pass_fail=ifelse(grade_mean>q1df1,TRUE,FALSE))
 df2<-df2%>%mutate(pass_fail=ifelse(grade_mean>meandf2,TRUE,FALSE))
+
+
 ```
 
 
@@ -116,16 +122,23 @@ base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = "fill")+facet_gri
 First step, set up the test set and training set.
 ```{r}
 library(caTools)
-set.seed(100)
+set.seed(144)
 split = sample.split(df1$pass_fail, SplitRatio = 0.65)
-train = subset(df1,split=TRUE)
-test = subset(df1,split=FALSE)
+train = subset(df1,split==TRUE)
+test = subset(df1,split==FALSE)
 ```
 
 Second, build the regression model
 
 ```{r}
-df1LOG = glm(pass_fail~., data = train, family = "binomial")
+df1LOG = glm(train$pass_fail~Dalc+Walc+famrel , data = train, family = "binomial")
 ```
 
+Third, use the model to predict the test model
+
+```{r}
+predictTest = predict(df1LOG, type = "response", newdata = test)
+table(test$pass_fail, predictTest >0.75)
+
+```
 
