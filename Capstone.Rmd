@@ -67,12 +67,12 @@ df1$Dalc <- mapvalues(df1$Dalc,
 df2$Dalc <- mapvalues(df2$Dalc, 
                               from = 1:5, 
                               to = c("Very Low", "Low", "Medium", "High", "Very High"))
-base1<-ggplot(df1,aes(x=Dalc,y=grade_mean,col=sex))
+base1<-ggplot(df1,aes(x=Dalc))
 ```
 
 
 ```{r}
-base1+geom_point()
+base1+geom_bar(aes(y= pass_fail=TRUE))
 ```
 
 ```{r}
@@ -109,3 +109,23 @@ base1_class_sex<-ggplot(df1,aes(x=school, col=sex))
 base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = "fill")+facet_grid(.~Dalc)+ggtitle("Gender Proportion of each group")
 
 ```
+
+
+###Logistic Regression
+
+First step, set up the test set and training set.
+```{r}
+library(caTools)
+set.seed(100)
+split = sample.split(df1$pass_fail, SplitRatio = 0.65)
+train = subset(df1,split=TRUE)
+test = subset(df1,split=FALSE)
+```
+
+Second, build the regression model
+
+```{r}
+df1LOG = glm(pass_fail~., data = train, family = "binomial")
+```
+
+
