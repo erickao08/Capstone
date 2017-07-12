@@ -62,8 +62,17 @@ df1<-df1%>%mutate(pass_fail=ifelse(grade_mean>q1df1,TRUE,FALSE))
 df2<-df2%>%mutate(pass_fail=ifelse(grade_mean>meandf2,TRUE,FALSE))
 
 
+
 ```
 
+Checking if the alcohol consumption is related with the test result or not. 
+```{r}
+
+##fail to pass the test and also daily alcohol consumption or weekend consumption is greater than 3 
+count(filter(df1, pass_fail == FALSE, Dalc > 3||Walc>3 ))
+```
+
+I found 0 rows in this search, which is showing there is not evidence that alcohol consumption has relationship with the test result. 
 
 
 ```{r}
@@ -117,6 +126,16 @@ base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = "fill")+facet_gri
 ```
 
 
+### Do the linear regression first
+```{r}
+df1lm = lm(grade_mean ~.-G1 -G2 -G3 -pass_fail,data=train)
+summary(df1lm)
+```
+
+
+
+
+
 ###Logistic Regression
 
 First step, set up the test set and training set.
@@ -131,7 +150,7 @@ test = subset(df1,split==FALSE)
 Second, build the regression model
 
 ```{r}
-df1LOG = glm(train$pass_fail~Dalc+Walc+famrel , data = train, family = "binomial")
+df1LOG = glm(train$pass_fail~.- school - sex -age, data = train, family = "binomial")
 ```
 
 Third, use the model to predict the test model
