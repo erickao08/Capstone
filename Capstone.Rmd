@@ -82,7 +82,7 @@ df1$Dalc <- mapvalues(df1$Dalc,
 df2$Dalc <- mapvalues(df2$Dalc, 
                               from = 1:5, 
                               to = c("Very Low", "Low", "Medium", "High", "Very High"))
-base1<-ggplot(df1,aes(x=Dalc))
+base1<-ggplot(df1,aes(x=Dalc,y=grade_mean,col=sex))
 ```
 
 
@@ -128,7 +128,7 @@ base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = "fill")+facet_gri
 
 ### Do the linear regression first
 ```{r}
-df1lm = lm(grade_mean ~.-G1 -G2 -G3 -pass_fail,data=train)
+df1lm = lm(Dalc ~famrel+sex ,data=train)
 summary(df1lm)
 ```
 
@@ -158,6 +158,11 @@ Third, use the model to predict the test model
 ```{r}
 predictTest = predict(df1LOG, type = "response", newdata = test)
 table(test$pass_fail, predictTest >0.75)
+
+```
+
+##Clustering
+```{r}
 
 ```
 
