@@ -87,7 +87,7 @@ base1<-ggplot(df1,aes(x=Dalc,y=grade_mean,col=sex))
 
 
 ```{r}
-base1+geom_bar(aes(y= pass_fail=TRUE))
+base1+geom_count()
 ```
 
 ```{r}
@@ -128,8 +128,11 @@ base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = "fill")+facet_gri
 
 ### Do the linear regression first
 ```{r}
-df1lm = lm(Dalc ~famrel+sex ,data=train)
+df1lm = lm(grade_mean ~.,data=train)
 summary(df1lm)
+
+df2lm = lm(grade_mean~., data=df2)
+summary(df2lm)
 ```
 
 
@@ -150,7 +153,7 @@ test = subset(df1,split==FALSE)
 Second, build the regression model
 
 ```{r}
-df1LOG = glm(train$pass_fail~.- school - sex -age, data = train, family = "binomial")
+df1LOG = glm(train$pass_fail~.-grade_mean-G1-G2-G3, data = train, family = "binomial")
 ```
 
 Third, use the model to predict the test model
@@ -161,8 +164,47 @@ table(test$pass_fail, predictTest >0.75)
 
 ```
 
-##Clustering
+##Random Forest
 ```{r}
+library(randomForest)
+
+train$pass_fail = as.factor(train$pass_fail)
+df1Forest = randomForest(pass_fail ~.-grade_mean-G1-G2-G3, data = train, nodesize= 25, ntree=200)
+PredictForest = predict(df1Forest,newdata = test)
+table(test$pass_fail, PredictForest)
+```
+
+##Decision tree
+```{r}
+library(rpart)
+library(rpart.plot)
+df1Tree = rpart(pass_fail~.-grade_mean-G1-G2-G3, data = train, method = "class", control = rpart.control(minbucket = 25))
+prp(df1Tree)
 
 ```
+
+
+#Use avg grade
+
+##Decision tree
+```{r}
+library(rpart)
+library(rpart.plot)
+df1avgTree = rpart(grade_mean~.-pass_fail-G1-G2-G3, data = train, method = "class", control = rpart.control(minbucket = 25))
+prp(df1avgTree)
+
+```
+
+
+use pass_fail:
+logistic 
+random forest 
+decision tree
+
+use avg grade:
+use:
+RMAC
+decision tree 
+regression random forest
+
 
