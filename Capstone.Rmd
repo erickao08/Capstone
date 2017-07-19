@@ -168,7 +168,7 @@ table(test$pass_fail, predictTest >0.75)
 ```{r}
 library(randomForest)
 
-train$pass_fail = as.factor(train$pass_fail)
+
 df1Forest = randomForest(pass_fail ~.-grade_mean-G1-G2-G3, data = train, nodesize= 25, ntree=200)
 PredictForest = predict(df1Forest,newdata = test)
 table(test$pass_fail, PredictForest)
@@ -192,6 +192,13 @@ library(rpart)
 library(rpart.plot)
 df1avgTree = rpart(grade_mean~.-pass_fail-G1-G2-G3, data = train, method = "class", control = rpart.control(minbucket = 25))
 prp(df1avgTree)
+
+```
+
+
+##Regression random forest
+```{r}
+
 
 ```
 
