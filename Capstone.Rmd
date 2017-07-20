@@ -11,10 +11,10 @@ knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(plyr)
 #preload all the dataframe
-df1 <-read.csv('student-mat.csv')
-df2 <-read.csv('student-por.csv')
+math <-read.csv('student-mat.csv')##math class grade
+portuguese <-read.csv('student-por.csv')##portugese
 
-d3=merge(df1,df2,by=c("school","sex","age","address","famsize","Pstatus","Medu","Fedu","Mjob","Fjob","reason","nursery","internet"))
+join_set=merge(math,portuguese,by=c("school","sex","age","address","famsize","Pstatus", "Medu","Fedu","Mjob","Fjob","reason","nursery","internet", "guardian","guardian","traveltime","studytime","failures", "schoolsup","famsup","activities","higher","romantic", "famrel","freetime","goout","Dalc","Walc","health","absences"))
 
 
 
@@ -27,67 +27,34 @@ d3=merge(df1,df2,by=c("school","sex","age","address","famsize","Pstatus","Medu",
 Let's take a first look of the dataset.
 
 ```{r}
-str(df1)
+
+str(join_set)
+
 ```
-There are 395 observation in the math class data set with 33 varibles.
-```{r}
-str(df2)
-```
-There are 395 observation in the math class data set with 33 varibles.
+
 
 
 ## Including Plots
 
 ###Data wrangling
 
-Since my first goal is to identify the realtionship between alcohol consumption and the grade. I need to create a column to record if the student fails the test or not.
+I create grade_mean_portuguese and grade_mean_math to record the average of the student and create another column total_mean to record the average of grade_mean_math and grade_mean_portuguese.
 
 ```{r}
 library(ggplot2)
-df2<-df2%>%mutate(grade_mean=(G1+G2+G3)/3)
-df1<-df1%>%mutate(grade_mean=(G1+G2+G3)/3)
-quantile(df1$grade_mean)
-df1$grade_mean
-df2$grade_mean
-```
-I calculated the mean to represent how well the students performance in the class.I also use it as a classifier to see if the student does better than the average of the class.
-
-```{r}
-meandf1 = mean(df1$grade_mean)
-meandf2 = mean(df2$grade_mean)
-
-q1df1 = 8.33
-
-df1<-df1%>%mutate(pass_fail=ifelse(grade_mean>q1df1,TRUE,FALSE))
-df2<-df2%>%mutate(pass_fail=ifelse(grade_mean>meandf2,TRUE,FALSE))
-
-
-
+join_set<-join_set%>%mutate(grade_mean_math=(G1.x+G2.x+G3.x)/3)%>%mutate(grade_mean_portuguese=(G1.y+G2.y+G3.y)/3)%>%mutate(total_mean = ((grade_mean_math+grade_mean_portuguese)/2) )
 ```
 
-Checking if the alcohol consumption is related with the test result or not. 
+Next, I change Dalc and Walc into text in order to read the value easier. 
 ```{r}
-
-##fail to pass the test and also daily alcohol consumption or weekend consumption is greater than 3 
-count(filter(df1, pass_fail == FALSE, Dalc > 3||Walc>3 ))
-```
-
-I found 0 rows in this search, which is showing there is not evidence that alcohol consumption has relationship with the test result. 
-
-
-```{r}
-df1$Dalc <- mapvalues(df1$Dalc, 
-                              from = 1:5, 
-                              to = c("Very Low", "Low", "Medium", "High", "Very High"))
-df2$Dalc <- mapvalues(df2$Dalc, 
-                              from = 1:5, 
-                              to = c("Very Low", "Low", "Medium", "High", "Very High"))
-base1<-ggplot(df1,aes(x=Dalc,y=grade_mean,col=sex))
+join_set$Dalc <- mapvalues(join_set$Dalc, from = 1:5, to = c("Very Low", "Low", "Medium", "High", "Very High"))
+join_set$Walc <- mapvalues(join_set$Dalc, from = 1:5, to = c("Very Low", "Low", "Medium", "High", "Very High"))
+base1<-ggplot(math,aes(x=Dalc,y= total_mean,col=sex))
 ```
 
 
 ```{r}
-base1+geom_count()
+base1+geom_boxplot()
 ```
 
 ```{r}
@@ -102,10 +69,10 @@ base1+geom_boxplot()+facet_grid(.~Dalc)+ggtitle("Student boxplot based on Workda
 
 check grade by sex and Dalc
 ```{r}
-base1_G1<-ggplot(df1,aes(x=Dalc,y=G1,col=sex))
-base1_G2<-ggplot(df1,aes(x=Dalc,y=G2,col=sex))
-base1_G3<-ggplot(df1,aes(x=Dalc,y=G3,col=sex))
-base1_class_sex<-ggplot(df1,aes(x=school, col=sex))
+base1_G1<-ggplot(math,aes(x=Dalc,y=G1,col=sex))
+base1_G2<-ggplot(math,aes(x=Dalc,y=G2,col=sex))
+base1_G3<-ggplot(math,aes(x=Dalc,y=G3,col=sex))
+base1_class_sex<-ggplot(math,aes(x=school, col=sex))
 
 ```
 
@@ -113,53 +80,52 @@ base1_class_sex<-ggplot(df1,aes(x=school, col=sex))
 base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = 'fill')+ggtitle("Gender Proportion of each group")
 
 ```
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
-
+The distribution of gender between schools are the same. 
 
 
 ```{r}
 
 #why this is not woring in here
-base1_class_sex<-ggplot(df1,aes(x=school, col=sex))
+base1_class_sex<-ggplot(math,aes(x=school, col=sex))
 base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = "fill")+facet_grid(.~Dalc)+ggtitle("Gender Proportion of each group")
 
+```
+Gender proportion of each daily consumption group. Male tends to drink more alcohol than female. 
+
+
+
+set up the test set and training set.
+
+```{r}
+library(caTools)
+set.seed(144)
+split = sample.split(math$pass_fail, SplitRatio = 0.65)
+train = subset(math,split==TRUE)
+test = subset(math,split==FALSE)
 ```
 
 
 ### Do the linear regression first
 ```{r}
-df1lm = lm(grade_mean ~.,data=train)
-summary(df1lm)
+mathlm = lm(grade_mean ~.-grade_mean-G1-G2-G3-pass_fail,data=train)
+summary(mathlm)
 
-df2lm = lm(grade_mean~., data=df2)
-summary(df2lm)
+portugueselm = lm(grade_mean~.-grade_mean-G1-G2-G3-pass_fail, data=portuguese)
+summary(portugueselm)
 ```
-
-
-
-
 
 ###Logistic Regression
 
-First step, set up the test set and training set.
-```{r}
-library(caTools)
-set.seed(144)
-split = sample.split(df1$pass_fail, SplitRatio = 0.65)
-train = subset(df1,split==TRUE)
-test = subset(df1,split==FALSE)
-```
-
-Second, build the regression model
+build the regression model
 
 ```{r}
-df1LOG = glm(train$pass_fail~.-grade_mean-G1-G2-G3, data = train, family = "binomial")
+mathLOG = glm(train$pass_fail~.-grade_mean-G1-G2-G3, data = train, family = "binomial")
 ```
 
 Third, use the model to predict the test model
 
 ```{r}
-predictTest = predict(df1LOG, type = "response", newdata = test)
+predictTest = predict(mathLOG, type = "response", newdata = test)
 table(test$pass_fail, predictTest >0.75)
 
 ```
@@ -167,10 +133,8 @@ table(test$pass_fail, predictTest >0.75)
 ##Random Forest
 ```{r}
 library(randomForest)
-
-
-df1Forest = randomForest(pass_fail ~.-grade_mean-G1-G2-G3, data = train, nodesize= 25, ntree=200)
-PredictForest = predict(df1Forest,newdata = test)
+mathForest = randomForest(pass_fail ~.-grade_mean-G1-G2-G3, data = train, nodesize= 25, ntree=200)
+PredictForest = predict(mathForest,newdata = test)
 table(test$pass_fail, PredictForest)
 ```
 
@@ -178,8 +142,8 @@ table(test$pass_fail, PredictForest)
 ```{r}
 library(rpart)
 library(rpart.plot)
-df1Tree = rpart(pass_fail~.-grade_mean-G1-G2-G3, data = train, method = "class", control = rpart.control(minbucket = 25))
-prp(df1Tree)
+mathTree = rpart(pass_fail~.-grade_mean-G1-G2-G3, data = train, method = "class", control = rpart.control(minbucket = 25))
+prp(mathTree)
 
 ```
 
@@ -190,9 +154,9 @@ prp(df1Tree)
 ```{r}
 library(rpart)
 library(rpart.plot)
-df1avgTree = rpart(grade_mean~.-pass_fail-G1-G2-G3, data = train, method = "class", control = rpart.control(minbucket = 25))
-prp(df1avgTree)
-
+mathavgTree = rpart(grade_mean~.-pass_fail-G1-G2-G3, data = train, control = rpart.control(minbucket = 25))
+prp(mathavgTree)
+##dont use method='method in rpart when you're building a regression model'
 ```
 
 
