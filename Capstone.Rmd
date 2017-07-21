@@ -49,36 +49,49 @@ Next, I change Dalc and Walc into text in order to read the value easier.
 ```{r}
 join_set$Dalc <- mapvalues(join_set$Dalc, from = 1:5, to = c("Very Low", "Low", "Medium", "High", "Very High"))
 join_set$Walc <- mapvalues(join_set$Dalc, from = 1:5, to = c("Very Low", "Low", "Medium", "High", "Very High"))
-base1<-ggplot(math,aes(x=Dalc,y= total_mean,col=sex))
-```
-
-
-```{r}
-base1+geom_boxplot()
-```
-
-```{r}
-base1+geom_jitter()+ggtitle("Student distribution dotplot based on Workday alcohol consumption")+labs(x="Workday Alcohol Consumption")
-```
-
-```{r}
-base1+geom_boxplot()+facet_grid(.~Dalc)+ggtitle("Student boxplot based on Workday alcohol consumption")
 
 ```
 
+When I do this I notice the there is no "High" and "Very high" in the data set. 
 
-check grade by sex and Dalc
+
+Let's see the gender structure of this sample.
 ```{r}
-base1_G1<-ggplot(math,aes(x=Dalc,y=G1,col=sex))
-base1_G2<-ggplot(math,aes(x=Dalc,y=G2,col=sex))
-base1_G3<-ggplot(math,aes(x=Dalc,y=G3,col=sex))
-base1_class_sex<-ggplot(math,aes(x=school, col=sex))
+ggplot(join_set, aes(x=sex,col=sex,fill=sex))+geom_bar(position= "dodge")
+```
+In this sample, there are 50 females and 35 males. 
+
+
+
+```{r}
+Dalc_total_mean<-ggplot(join_set,aes(x=reorder(Dalc,total_mean, order = FALSE),y= total_mean))
+Dalc_total_mean+geom_boxplot()+labs(x="Workday Alcohol Consumption")
+```
+
+
+From this plot, the group that consume "Medium" alcohol have a lower median then other 2 groups. The "Median" group also have a lower average than other 2 groups. 
+
+```{r}
+Dalc_total_mean+geom_jitter(aes(col= sex))+ggtitle("Student total_mean distribution dotplot based on Workday alcohol consumption")+labs(x="Workday Alcohol Consumption")
+```
+
+```{r}
+ggplot(join_set,aes(x=sex,col=sex))+geom_bar(position="dodge",aes(fill=sex))+facet_grid(. ~ reorder(Dalc,total_mean, order = FALSE))+ggtitle("Student headcount of each Workday alcohol consumption group")
+```
+Most of female students are in the "Very Low" group and there is no female students in "Medium" group. 
+
+
+
+
+```{r}
+ggplot(join_set ,aes(x=total_mean, y=total_mean,col=Dalc))+geom_jitter()
+
 
 ```
 
 ```{r}
-base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = 'fill')+ggtitle("Gender Proportion of each group")
-
+Walc_total_mean = ggplot(join_set,aes(x=reorder(Walc,total_mean, order = FALSE),y= total_mean))
+Walc_total_mean + geom_boxplot()+labs(x="Workday Alcohol Consumption")
 ```
 The distribution of gender between schools are the same. 
 
