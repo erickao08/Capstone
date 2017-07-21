@@ -112,41 +112,31 @@ set up the test set and training set.
 ```{r}
 library(caTools)
 set.seed(144)
-split = sample.split(math$pass_fail, SplitRatio = 0.65)
-train = subset(math,split==TRUE)
-test = subset(math,split==FALSE)
+split = sample.split(join_set$total_mean, SplitRatio = 0.65)
+train = subset(join_set,split==TRUE)
+test = subset(join_set,split==FALSE)
 ```
 
 
 ### Do the linear regression first
 ```{r}
-mathlm = lm(grade_mean ~.-grade_mean-G1-G2-G3-pass_fail,data=train)
+Train.lm = lm(train$total_mean ~.-G1.x-G2.x-G3.x-G1.y-G2.y-G3.y-grade_mean_math-grade_mean_portuguese,data=train)
 summary(mathlm)
 
-portugueselm = lm(grade_mean~.-grade_mean-G1-G2-G3-pass_fail, data=portuguese)
-summary(portugueselm)
 ```
 
-###Logistic Regression
 
-build the regression model
-
-```{r}
-mathLOG = glm(train$pass_fail~.-grade_mean-G1-G2-G3, data = train, family = "binomial")
-```
 
 Third, use the model to predict the test model
 
 ```{r}
-predictTest = predict(mathLOG, type = "response", newdata = test)
-table(test$pass_fail, predictTest >0.75)
 
 ```
 
 ##Random Forest
 ```{r}
 library(randomForest)
-mathForest = randomForest(pass_fail ~.-grade_mean-G1-G2-G3, data = train, nodesize= 25, ntree=200)
+mathForest = randomForest(.-grade_mean-G1-G2-G3, data = train, nodesize= 25, ntree=200)
 PredictForest = predict(mathForest,newdata = test)
 table(test$pass_fail, PredictForest)
 ```
