@@ -48,7 +48,7 @@ join_set<-join_set%>%mutate(grade_mean_math=(G1.x+G2.x+G3.x)/3)%>%mutate(grade_m
 Next, I change Dalc and Walc into text in order to read the value easier. 
 ```{r}
 join_set$Dalc <- mapvalues(join_set$Dalc, from = 1:5, to = c("Very Low", "Low", "Medium", "High", "Very High"))
-join_set$Walc <- mapvalues(join_set$Dalc, from = 1:5, to = c("Very Low", "Low", "Medium", "High", "Very High"))
+join_set$Walc <- mapvalues(join_set$Walc, from = 1:5, to = c("Very Low", "Low", "Medium", "High", "Very High"))
 
 ```
 
@@ -91,7 +91,7 @@ ggplot(join_set ,aes(x=total_mean, y=total_mean,col=Dalc))+geom_jitter()
 
 ```{r}
 Walc_total_mean = ggplot(join_set,aes(x=reorder(Walc,total_mean, order = FALSE),y= total_mean))
-Walc_total_mean + geom_boxplot()+labs(x="Workday Alcohol Consumption")
+Walc_total_mean + geom_boxplot()+labs(x="Weekend Alcohol Consumption")
 ```
 The distribution of gender between schools are the same. 
 
@@ -100,7 +100,7 @@ The distribution of gender between schools are the same.
 
 #why this is not woring in here
 base1_class_sex<-ggplot(math,aes(x=school, col=sex))
-base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = "fill")+facet_grid(.~Dalc)+ggtitle("Gender Proportion of each group")
+base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = "fill")+facet_grid(.~Walc)+ggtitle("Gender Proportion of each group")
 
 ```
 Gender proportion of each daily consumption group. Male tends to drink more alcohol than female. 
@@ -129,24 +129,21 @@ summary(mathlm)
 
 Third, use the model to predict the test model
 
-```{r}
-
-```
 
 ##Random Forest
 ```{r}
 library(randomForest)
-mathForest = randomForest(.-grade_mean-G1-G2-G3, data = train, nodesize= 25, ntree=200)
-PredictForest = predict(mathForest,newdata = test)
-table(test$pass_fail, PredictForest)
+TrainrForest = randomForest( total_mean ~ . -G1.x-G2.x-G3.x-G1.y-G2.y-G3.y-grade_mean_math-grade_mean_portuguese, data = train, nodesize= 25, ntree=200)
+PredictForest = predict(TrainrForest,newdata = test)
+table(test$total_mean, PredictForest)
 ```
 
 ##Decision tree
 ```{r}
 library(rpart)
 library(rpart.plot)
-mathTree = rpart(pass_fail~.-grade_mean-G1-G2-G3, data = train, method = "class", control = rpart.control(minbucket = 25))
-prp(mathTree)
+TrainTree = rpart(total_mean~. -G1.x-G2.x-G3.x-G1.y-G2.y-G3.y-grade_mean_math-grade_mean_portuguese, data = train,  control = rpart.control(minbucket = 25))
+prp(TrainTree)
 
 ```
 
