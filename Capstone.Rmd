@@ -219,20 +219,11 @@ library(rpart.plot)
 TrainTree = rpart(total_mean~. -G1.x-G2.x-G3.x-G1.y-G2.y-G3.y-grade_mean_math-grade_mean_portuguese, data = train,  control = rpart.control(minbucket = 25))
 prp(TrainTree)
 
-fittedvalues = predict(TrainTree)
+tree.pred = predict(TrainTree,newdata = test)
+tree.sse = sum((tree.pred-test$total_mean))
+tree.Rsquare = R_sqare= 1-(tree.sse/SST_pre)
+tree.Rsquare
 
-library(caret)
-library(e1071)
-test$school = as.factor(test$school)
-train$school = as.factor(train$school)
-tr.control = trainControl(method = "cv", number = 10)
-cp.grid = expand.grid(.cp = (0:10)*0.001)
-tr= train(total_mean~. -G1.x-G2.x-G3.x-G1.y-G2.y-G3.y-grade_mean_math-grade_mean_portuguese, data = train, method = "rpart", trControl = tr.control, tuneGrid = cp.grid )
-## the result is different with the video, maybe the version issue? 
-best.tree = tr$finalModel
-prp(best.tree)
-#best.tree.pred= predict(best.tree, newdata = test)
-#best.tree.sse = sum((best.tree.pred-test$total_mean)^2)
 ```
 
 
