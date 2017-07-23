@@ -203,7 +203,13 @@ test$Dalc = as.factor(test$Dalc)
 test$Walc = as.factor(test$Walc)
 TrainrForest = randomForest( total_mean ~ . -G1.x-G2.x-G3.x-G1.y-G2.y-G3.y-grade_mean_math-grade_mean_portuguese, data = train, nodesize= 25, ntree=200)
 PredictForest = predict(TrainrForest, newdata = test)
-table(test$total_mean, PredictForest)
+SSE_pre= sum((test$total_mean-PredictForest)^2)
+SST_pre= sum((test$total_mean-mean(train$total_mean))^2)
+R_sqare= 1-(SSE_pre/SST_pre)
+
+SSE_pre
+SST_pre
+R_sqare
 ```
 
 ##Decision tree
