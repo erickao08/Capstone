@@ -47,8 +47,8 @@ join_set<-join_set%>%mutate(grade_mean_math=(G1.x+G2.x+G3.x)/3)%>%mutate(grade_m
 
 Next, I change Dalc and Walc into text in order to read the value easier. 
 ```{r}
-join_set$Dalc <- mapvalues(join_set$Dalc, from = 1:5, to = c("Very Low", "Low", "Medium", "High", "Very High"))
-join_set$Walc <- mapvalues(join_set$Walc, from = 1:5, to = c("Very Low", "Low", "Medium", "High", "Very High"))
+join_set$DalcV <- mapvalues(join_set$Dalc, from = 1:5, to = c("Very Low", "Low", "Medium", "High", "Very High"))
+join_set$WalcV <- mapvalues(join_set$Walc, from = 1:5, to = c("Very Low", "Low", "Medium", "High", "Very High"))
 
 ```
 
@@ -62,6 +62,22 @@ ggplot(join_set, aes(x=sex,col=sex,fill=sex))+geom_bar(position= "dodge")
 In this sample, there are 50 females and 35 males. 
 
 
+###What's the consumption distribution for both group
+```{r}
+ggplot(join_set, aes(x=sex,  fill=DalcV)) +
+geom_bar(stat="count")
+```
+
+```{r}
+ggplot(join_set, aes(x=sex,  fill=WalcV)) +geom_bar(stat="count")
+```
+
+This graph also show that there is a large portion of both group consume very low alcohol. 
+
+
+## Alcohol consumption and Student's grade relationship
+
+
 
 ```{r}
 Dalc_total_mean<-ggplot(join_set,aes(x=reorder(Dalc,total_mean, order = FALSE),y= total_mean))
@@ -69,42 +85,65 @@ Dalc_total_mean+geom_boxplot()+labs(x="Workday Alcohol Consumption")
 ```
 
 
-From this plot, the group that consume "Medium" alcohol have a lower median then other 2 groups. The "Median" group also have a lower average than other 2 groups. 
+From this plot, the group that consume "Medium" alcohol have a lower median then other 2 groups. The "Median" group also have a lower average than other 2 groups.
+
+
+
+```{r}
+Walc_total_mean = ggplot(join_set,aes(x=reorder(Walc,total_mean, order = FALSE),y= total_mean))
+
+Walc_total_mean+geom_boxplot(aes(x=reorder(Walc,total_mean, order = FALSE)))+labs(x="Workday Alcohol Consumption")
+```
+The "High" group have the lowest total_mean and the "Medium" group have the second lowest total_mean. Surprisingly, the "Very High" have the second highest total_mean. 
+
+
+##Health and Student grade relationship
+
+```{r}
+Health_total_mean =  ggplot(join_set,aes(x=as.factor(health),y= total_mean))
+Health_total_mean + geom_boxplot()+labs(x= "Health status")
+```
+According to the plot, the group of student who has the worst health condition perform actually better than the other group. The healthiest group has the widest distribution in the total_mean. 
+
+##Health and alcohol consumption relationship
+
+```{r}
+ggplot(join_set, aes(x= as.factor(Dalc), y = as.factor(health) ))+geom_jitter(aes(col= sex))+ggtitle("Student total_mean distribution dotplot based on Workday alcohol consumption")+labs(x="Workday Alcohol Consumption")+facet_grid(.~health)
+```
+From this plot, the healthiest group does not related to the least alcohol consumption. On contrary, the least healthy group have no student is in "Medium" alcohol consumption group. 
+
+```{r}
+ggplot(join_set, aes(x= as.factor(Walc), y = as.factor(health) ))+geom_jitter(aes(col= sex))+ggtitle("Student total_mean distribution dotplot based on Workday alcohol consumption")+labs(x="Workday Alcohol Consumption")+facet_grid(.~health)
+```
+
+The least healthy group have no one falls in the "Very high" and "high" groups; however in the "low" group of health, there are 5 student in the "Very high" and "high" groups.
 
 ```{r}
 Dalc_total_mean+geom_jitter(aes(col= sex))+ggtitle("Student total_mean distribution dotplot based on Workday alcohol consumption")+labs(x="Workday Alcohol Consumption")
 ```
 
 ```{r}
-ggplot(join_set,aes(x=sex,col=sex))+geom_bar(position="dodge",aes(fill=sex))+facet_grid(. ~ reorder(Dalc,total_mean, order = FALSE))+ggtitle("Student headcount of each Workday alcohol consumption group")
+ggplot(join_set,aes(x=sex,col=sex))+geom_bar(position="dodge",stat="count",aes(fill=sex))+facet_grid(. ~ reorder(Dalc,total_mean, order = FALSE))+ggtitle("Student headcount of each Workday alcohol consumption group")
 ```
 Most of female students are in the "Very Low" group and there is no female students in "Medium" group. 
 
 
 
 
-```{r}
-ggplot(join_set ,aes(x=total_mean, y=total_mean,col=Dalc))+geom_jitter()
 
 
-```
 
-```{r}
-Walc_total_mean = ggplot(join_set,aes(x=reorder(Walc,total_mean, order = FALSE),y= total_mean))
-Walc_total_mean + geom_boxplot()+labs(x="Weekend Alcohol Consumption")
-```
 The distribution of gender between schools are the same. 
 
 
 ```{r}
 
 #why this is not woring in here
-base1_class_sex<-ggplot(math,aes(x=school, col=sex))
+base1_class_sex<-ggplot(join_set,aes(x=school, col=sex))
 base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = "fill")+facet_grid(.~Walc)+ggtitle("Gender Proportion of each group")
 
 ```
 Gender proportion of each daily consumption group. Male tends to drink more alcohol than female. 
-
 
 
 set up the test set and training set.
@@ -133,18 +172,36 @@ Third, use the model to predict the test model
 ##Random Forest
 ```{r}
 library(randomForest)
+train$Dalc = as.factor(train$Dalc)
+train$Walc = as.factor(train$Walc)
+test$Dalc = as.factor(test$Dalc)
+test$Walc = as.factor(test$Walc)
 TrainrForest = randomForest( total_mean ~ . -G1.x-G2.x-G3.x-G1.y-G2.y-G3.y-grade_mean_math-grade_mean_portuguese, data = train, nodesize= 25, ntree=200)
-PredictForest = predict(TrainrForest,newdata = test)
-table(test$total_mean, PredictForest)
+PredictForest = predict(TrainrForest, newdata = test)
+View(table(test$total_mean, PredictForest))
 ```
 
 ##Decision tree
 ```{r}
 library(rpart)
 library(rpart.plot)
-TrainTree = rpart(total_mean~. -G1.x-G2.x-G3.x-G1.y-G2.y-G3.y-grade_mean_math-grade_mean_portuguese, data = train,  control = rpart.control(minbucket = 25))
+TrainTree = rpart(total_mean~. -G1.x-G2.x-G3.x-G1.y-G2.y-G3.y-grade_mean_math-grade_mean_portuguese, data = train,  control = rpart.control(minbucket = 25),method="anova")
 prp(TrainTree)
 
+fittedvalues = predict(TrainTree)
+
+library(caret)
+library(e1071)
+test$school = as.factor(test$school)
+train$school = as.factor(train$school)
+tr.control = trainControl(method = "cv", number = 10)
+cp.grid = expand.grid(.cp = (0:10)*0.001)
+tr= train(total_mean~. -G1.x-G2.x-G3.x-G1.y-G2.y-G3.y-grade_mean_math-grade_mean_portuguese, data = train, method = "rpart", trControl = tr.control, tuneGrid = cp.grid )
+## the result is different with the video, maybe the version issue? 
+best.tree = tr$finalModel
+prp(best.tree)
+best.tree.pred= predict(best.tree, newdata = test)
+best.tree.sse = sum((best.tree.pred-test$total_mean)^2)
 ```
 
 
