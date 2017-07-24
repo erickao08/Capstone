@@ -46,7 +46,7 @@ I create grade_mean_portuguese and grade_mean_math to record the average of the 
 
 ```{r}
 library(ggplot2)
-join_set<-join_set%>%mutate(grade_mean_math=(G1.x+G2.x+G3.x)/3)%>%mutate(grade_mean_portuguese=(G1.y+G2.y+G3.y)/3)%>%mutate(total_mean = ((grade_mean_math+grade_mean_portuguese)/2) )
+join_set<-join_set%>%mutate(grade_mean_math=(G1.x+G2.x+G3.x)/3)%>%mutate(grade_mean_portuguese=(G1.y+G2.y+G3.y)/3)%>%mutate(total_mean = ((grade_mean_math+grade_mean_portuguese)/2) )%>%mutate(schoolsup=as.factor(schoolsup),famsup=as.factor(famsup),paid.x=as.factor(paid.x),paid.y=as.factor(paid.y),activities=as.factor(activities),nursery=as.factor(nursery),higher=as.factor(higher),internet=as.factor(internet),romantic=as.factor(romantic)) 
 ```
 
 Next, I change Dalc and Walc into text in order to read the value easier. 
@@ -179,8 +179,7 @@ Train.lm.improve = lm(total_mean ~Mjob+reason+nursery+romantic+absences+paid.x,d
 
 summary(Train.lm)
 Traim.lm.predict= predict(Train.lm, newdata = test)
-Traim.lm.predict
-table(test$total_mean, Traim.lm.predict)
+
 SSE_pre= sum((test$total_mean-Traim.lm.predict)^2)
 SST_pre= sum((test$total_mean-mean(train$total_mean))^2)
 R_sqare= 1-(SSE_pre/SST_pre)
@@ -219,24 +218,16 @@ library(rpart.plot)
 TrainTree = rpart(total_mean~. -G1.x-G2.x-G3.x-G1.y-G2.y-G3.y-grade_mean_math-grade_mean_portuguese, data = train,  control = rpart.control(minbucket = 25))
 prp(TrainTree)
 
+```
+Decision tree R-square
+```{r}
 tree.pred = predict(TrainTree,newdata = test)
 tree.sse = sum((tree.pred-test$total_mean))
-tree.Rsquare = R_sqare= 1-(tree.sse/SST_pre)
+tree.sst= sum((test$total_mean-mean(train$total_mean))^2)
+tree.Rsquare = R_sqare= 1-(tree.sse/tree.sst)
 tree.Rsquare
-
 ```
 
 
-
-use pass_fail:
-logistic 
-random forest 
-decision tree
-
-use avg grade:
-use:
-RMAC
-decision tree 
-regression random forest
 
 
