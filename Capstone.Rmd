@@ -61,7 +61,7 @@ When I do this I notice the there is no "High" and "Very high" in the data set.
 
 Let's see the gender structure of this sample.
 ```{r}
-ggplot(join_set, aes(x=sex,col=sex,fill=sex))+geom_bar(position= "dodge")
+ggplot(join_set, aes(x=sex,col=sex,fill=sex))+geom_bar(position= "dodge")+ggtitle("Gender composition")
 ```
 In this sample, there are 50 females and 35 males. 
 
@@ -178,6 +178,10 @@ Train.lm = lm(total_mean ~.-G1.x-G2.x-G3.x-G1.y-G2.y-G3.y-grade_mean_math-grade_
 Train.lm.improve = lm(total_mean ~Mjob+reason+nursery+romantic+absences+paid.x,data=train)
 
 summary(Train.lm)
+```
+
+
+```{r}
 Traim.lm.predict= predict(Train.lm, newdata = test)
 
 SSE_pre= sum((test$total_mean-Traim.lm.predict)^2)
@@ -188,9 +192,6 @@ SST_pre
 R_sqare
 ```
 
-
-
-Third, use the model to predict the test model
 
 
 ##Random Forest
@@ -225,6 +226,8 @@ tree.pred = predict(TrainTree,newdata = test)
 tree.sse = sum((tree.pred-test$total_mean))
 tree.sst= sum((test$total_mean-mean(train$total_mean))^2)
 tree.Rsquare = R_sqare= 1-(tree.sse/tree.sst)
+tree.sse
+tree.sst
 tree.Rsquare
 ```
 
