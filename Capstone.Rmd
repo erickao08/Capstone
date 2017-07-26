@@ -60,9 +60,13 @@ When I do this I notice the there is no "High" and "Very high" in the data set.
 
 
 Let's see the gender structure of this sample.
+
+
 ```{r}
 ggplot(join_set, aes(x=sex,col=sex,fill=sex))+geom_bar(position= "dodge")+ggtitle("Gender composition")
 ```
+
+
 In this sample, there are 50 females and 35 males. 
 
 
@@ -75,6 +79,8 @@ geom_bar(stat="count")+ggtitle(" Workday alcohol consumption distribution based 
 ```{r}
 ggplot(join_set, aes(x=sex,  fill=WalcV)) +geom_bar(stat="count")+ggtitle(" Weekend alcohol consumption distribution based on genders")
 ```
+
+
 
 This graph also show that there is a large portion of both group consume very low alcohol. 
 
@@ -89,6 +95,8 @@ Dalc_total_mean+geom_boxplot()+labs(x="Workday Alcohol Consumption")+ggtitle(" W
 ```
 
 
+
+
 From this plot, the group that consume "Medium" alcohol have a lower median then other 2 groups. The "Median" group also have a lower average than other 2 groups.
 
 
@@ -98,6 +106,9 @@ Walc_total_mean = ggplot(join_set,aes(x=reorder(Walc,total_mean, order = FALSE),
 
 Walc_total_mean+geom_boxplot(aes(x=reorder(WalcV,total_mean, order = FALSE)))+labs(x="Workday Alcohol Consumption")+ggtitle(" Weekend alcohol consumption boxplot and average grade ")
 ```
+
+
+
 The "High" group have the lowest total_mean and the "Medium" group have the second lowest total_mean. Surprisingly, the "Very High" have the second highest total_mean. 
 
 ```{r}
@@ -113,6 +124,10 @@ ggplot(join_set,aes(x=as.factor(WalcV),y= as.factor(DalcV), col = as.factor((Dal
 Health_total_mean =  ggplot(join_set,aes(x=as.factor(health),y= total_mean))
 Health_total_mean + geom_boxplot()+labs(x= "Health status")
 ```
+
+
+
+
 According to the plot, the group of student who has the worst health condition perform actually better than the other group. The healthiest group has the widest distribution in the total_mean. 
 
 
@@ -123,44 +138,27 @@ According to the plot, the group of student who has the worst health condition p
 ```{r}
 ggplot(join_set, aes(x= as.factor(Dalc), y = as.factor(health) ))+geom_jitter(aes(col= sex))+ggtitle("Student health distribution dotplot based on Workday alcohol consumption")+labs(x="Workday Alcohol Consumption")+facet_grid(.~health)
 ```
+
+
+
 From this plot, the healthiest group does not related to the least alcohol consumption. On contrary, the least healthy group have no student is in "Medium" alcohol consumption group. 
 
 ```{r}
 ggplot(join_set, aes(x= as.factor(Walc), y = as.factor(health) ))+geom_jitter(aes(col= sex))+ggtitle("Student health distribution dotplot based on weekend alcohol consumption")+labs(x="Weekend Alcohol Consumption")+facet_grid(.~health)
 ```
 
+
+
 The least healthy group have no one falls in the "Very high" and "high" groups; however in the "low" group of health, there are 5 student in the "Very high" and "high" groups.
 
-```{r}
-Dalc_total_mean+geom_jitter(aes(col= sex))+ggtitle("Student total_mean distribution dotplot based on Workday alcohol consumption")+labs(x="Workday Alcohol Consumption")
-```
-
-```{r}
-ggplot(join_set,aes(x=sex,col=sex))+geom_bar(position="dodge",stat="count",aes(fill=sex))+facet_grid(. ~ reorder(Dalc,total_mean, order = FALSE))+ggtitle("Student headcount of each Workday alcohol consumption group")
-```
-Most of female students are in the "Very Low" group and there is no female students in "Medium" group. 
 
 
 
 
-
-
-
-The distribution of gender between schools are the same. 
-
-
-```{r}
-
-#why this is not woring in here
-base1_class_sex<-ggplot(join_set,aes(x=school, col=sex))
-base1_class_sex+geom_bar(aes(fill=sex),stat="count",position = "fill")+facet_grid(.~Walc)+ggtitle("Gender Proportion of each group")
-
-```
-Gender proportion of each daily consumption group. Male tends to drink more alcohol than female. 
 
 #Data Modeling
 
-set up the test set and training set.
+Set up the test set and training set.
 
 ```{r}
 library(caTools)
@@ -171,26 +169,32 @@ test = subset(join_set,split==FALSE)
 ```
 
 
-### Do the linear regression first
+### Linear Regression
 ```{r}
-
 Train.lm = lm(total_mean ~.-G1.x-G2.x-G3.x-G1.y-G2.y-G3.y-grade_mean_math-grade_mean_portuguese,data=train)
-Train.lm.improve = lm(total_mean ~Mjob+reason+nursery+romantic+absences+paid.x,data=train)
-
 summary(Train.lm)
+Train.lm.improve = lm(total_mean ~Mjob+reason+nursery+romantic+absences+paid.x,data=train)
+summary(Train.lm.improve)
+Train.lm.improve2 = lm(total_mean ~Mjob+nursery+romantic,data=train)
+summary(Train.lm.improve2)
 ```
 
 
 ```{r}
-Traim.lm.predict= predict(Train.lm, newdata = test)
-
+#Traim.lm.predict= predict(Train.lm, newdata = test)
+#Traim.lm.predict= predict(Train.lm.improve, newdata = test)
+Traim.lm.predict= predict(Train.lm.improve2, newdata = test)#improved model
 SSE_pre= sum((test$total_mean-Traim.lm.predict)^2)
 SST_pre= sum((test$total_mean-mean(train$total_mean))^2)
 R_sqare= 1-(SSE_pre/SST_pre)
+MSRE= sqrt(SSE_pre/nrow(test))
 SSE_pre
 SST_pre
 R_sqare
+MSRE
 ```
+Before improving the model, the r-square is -5.49. RSME is 7.66.
+After improving, the r-square is -0.3074805. RSME is 3.440894.
 
 
 
@@ -203,34 +207,52 @@ test$Dalc = as.factor(test$Dalc)
 test$Walc = as.factor(test$Walc)
 TrainrForest = randomForest( total_mean ~ . -G1.x-G2.x-G3.x-G1.y-G2.y-G3.y-grade_mean_math-grade_mean_portuguese, data = train, nodesize= 25, ntree=200)
 PredictForest = predict(TrainrForest, newdata = test)
-SSE_pre= sum((test$total_mean-PredictForest)^2)
-SST_pre= sum((test$total_mean-mean(train$total_mean))^2)
-R_sqare= 1-(SSE_pre/SST_pre)
+rf.SSE_pre= sum((test$total_mean-PredictForest)^2)
+rf.SST_pre= sum((test$total_mean-mean(train$total_mean))^2)
+rf.R_sqare= 1-(rf.SSE_pre/rf.SST_pre)
+rf.MSRE = sqrt(rf.SSE_pre/nrow(test))
 
-SSE_pre
-SST_pre
-R_sqare
+rf.SSE_pre
+rf.SST_pre
+rf.R_sqare
+rf.MSRE
 ```
+The r-square is 0.1134692. RSME is 2.833353.
 
 ##Decision tree
 ```{r}
 library(rpart)
 library(rpart.plot)
-TrainTree = rpart(total_mean~. -G1.x-G2.x-G3.x-G1.y-G2.y-G3.y-grade_mean_math-grade_mean_portuguese, data = train,  control = rpart.control(minbucket = 25))
+TrainTree = rpart(total_mean~. -G1.x-G2.x-G3.x-G1.y-G2.y-G3.y-grade_mean_math-grade_mean_portuguese, data = train)
 prp(TrainTree)
 
 ```
+
+
+
 Decision tree R-square
+
 ```{r}
 tree.pred = predict(TrainTree,newdata = test)
 tree.sse = sum((tree.pred-test$total_mean))
 tree.sst= sum((test$total_mean-mean(train$total_mean))^2)
-tree.Rsquare = R_sqare= 1-(tree.sse/tree.sst)
+tree.Rsquare= 1-(tree.sse/tree.sst)
+tree.RSME = sqrt(tree.sse/nrow(test))
 tree.sse
 tree.sst
 tree.Rsquare
-```
+tree.RSME
 
+```
+The r-square is 0.9719373. RSME is 0.5041024.
+
+
+##Conclusion
+In the sample distribution, the most of the student do not drink much alcohol, but on the weekend the restriction are slightly loose. In the analysis, it point out that the performance of students does not have a direct relationship with weekend alcohol consumption but if the student consume alcohol in the workdays, it has slightly negative relationship. 
+
+The prediction model shows an interesting conclusion because the student who has family educational support should perform better in the test. On contrary, those students are predicted to have a lower score. I assume the family educational support might kill the student’s interest of learning. Nowaday, the cram school education are thriving in the US and that can possibly put out the student’s interest of learning.
+
+After all, I think the school authority should think about how to ignite students’ passion of learning. No matter how good the education program can be, if the teacher cannot give the student the will of learning, it will be a waste. Parents, especially the mother also plays a vital role in the student’s education. I used to think if one of the parents is teacher, the student can performance better since the student can discuss the school work with the parent whenever they want. In this case, the student has the worst performance when the mother is a teacher. I can imagine a world that the student collapse because one of the parents is a teacher and pressure the student hard. In the end, if the student is not interested in learning, no one will be able to force it. 
 
 
 
