@@ -187,14 +187,14 @@ Traim.lm.predict= predict(Train.lm.improve2, newdata = test)#improved model
 SSE_pre= sum((test$total_mean-Traim.lm.predict)^2)
 SST_pre= sum((test$total_mean-mean(train$total_mean))^2)
 R_sqare= 1-(SSE_pre/SST_pre)
-MSRE= sqrt(SSE_pre/nrow(test))
+RMSE= sqrt(SSE_pre/nrow(test))
 SSE_pre
 SST_pre
 R_sqare
-MSRE
+RMSE
 ```
-Before improving the model, the r-square is -5.49. RSME is 7.66.
-After improving, the r-square is -0.3074805. RSME is 3.440894.
+Before improving the model, the r-square is -5.49. RMSE is 7.66.
+After improving, the r-square is -0.3074805. RMSE is 3.440894.
 
 
 
@@ -210,14 +210,14 @@ PredictForest = predict(TrainrForest, newdata = test)
 rf.SSE_pre= sum((test$total_mean-PredictForest)^2)
 rf.SST_pre= sum((test$total_mean-mean(train$total_mean))^2)
 rf.R_sqare= 1-(rf.SSE_pre/rf.SST_pre)
-rf.MSRE = sqrt(rf.SSE_pre/nrow(test))
+rf.RMSE = sqrt(rf.SSE_pre/nrow(test))
 
 rf.SSE_pre
 rf.SST_pre
 rf.R_sqare
-rf.MSRE
+rf.RMSE
 ```
-The r-square is 0.1134692. RSME is 2.833353.
+The r-square is 0.1134692. RMSE is 2.833353.
 
 ##Decision tree
 ```{r}
@@ -237,14 +237,14 @@ tree.pred = predict(TrainTree,newdata = test)
 tree.sse = sum((tree.pred-test$total_mean))
 tree.sst= sum((test$total_mean-mean(train$total_mean))^2)
 tree.Rsquare= 1-(tree.sse/tree.sst)
-tree.RSME = sqrt(tree.sse/nrow(test))
+tree.RMSE = sqrt(tree.sse/nrow(test))
 tree.sse
 tree.sst
 tree.Rsquare
-tree.RSME
+tree.RMSE
 
 ```
-The r-square is 0.9719373. RSME is 0.5041024.
+The r-square is 0.9719373. RMSE is 0.5041024, the smallest in all the model. Decision tree is the best model. 
 
 
 ##Conclusion
